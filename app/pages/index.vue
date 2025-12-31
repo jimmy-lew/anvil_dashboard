@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ChevronDownIcon, ChevronRight, EllipsisVerticalIcon, FilterIcon, PlayCircleIcon, RefreshCwIcon } from 'lucide-vue-next'
+import { ChevronDownIcon } from 'lucide-vue-next'
 
 const isOpen = ref(false)
 
@@ -82,32 +82,7 @@ onUnmounted(() => { log_stream_client.disconnect() })
     <div class="flex flex-col relative h-full">
       <div class="flex flex-col items-stretch justify-start flex-initial sticky border-b overflow-x-auto">
         <div class="px-3 pt-3">
-          <div class="flex flex-col md:flex-row items-stretch justify-start flex-initial">
-            <div class="flex flex-row items-stretch justify-start md:gap-2 flex-initial grow">
-              <Button class="hidden md:inline-flex" variant="outline" size="icon">
-                <FilterIcon />
-              </Button>
-              <LogDownload class="hidden md:inline-flex" />
-              <LogSearch :logs />
-            </div>
-            <div class="flex flex-row items-stretch justify-start gap-2 flex-initial">
-              <Button class="md:hidden" variant="outline" size="icon">
-                <FilterIcon />
-              </Button>
-              <LogDownload class="md:hidden" />
-              <div class="flex-1 md:hidden" />
-              <Button variant="outline">
-                <PlayCircleIcon />
-                Live
-              </Button>
-              <Button variant="outline" size="icon">
-                <RefreshCwIcon class="animate-spin" />
-              </Button>
-              <Button variant="outline" size="icon">
-                <EllipsisVerticalIcon />
-              </Button>
-            </div>
-          </div>
+          <LogSearch :logs />
           <LogChart :logs range="1d" />
           <div ref="log_header" class="max-w-screen overflow-x-hidden no-scrollbar">
             <div class="flex flex-row items-center justify-stretch flex-initial text-base h-10 min-w-4xl">
@@ -141,7 +116,8 @@ onUnmounted(() => { log_stream_client.disconnect() })
         </SidebarProvider>
       </div>
 
-      <div v-if="isOpen" :style="{ height: panelOpen ? '360px' : '50px' }" class="fixed block bottom-0 right-[max(min(407px,50vw),357px)] left-69.5 border-t">
+      <!-- Technically left should be 270px -->
+      <div v-if="isOpen" :style="{ height: panelOpen ? '360px' : '50px' }" class="fixed block bottom-0 right-[max(min(400px,50vw),350px)] left-76 border-t">
         <div class="flex h-full flex-1 flex-col transition-all sm:flex-initial">
           <div class="flex items-center justify-between border-b p-2 bg-background">
             <span class="px-3 py-1.5">Logs</span>
