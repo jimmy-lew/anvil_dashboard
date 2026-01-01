@@ -6,7 +6,6 @@ import { parse } from 'ms'
 import { ChartTooltipContent, componentToString } from '@/components/ui/chart'
 
 interface ChartProps {
-  logs: RawLogItem[]
   range?: '30m' | '1h' | '3h' | '1d'
   start?: number
 }
@@ -16,7 +15,8 @@ const props = withDefaults(defineProps<ChartProps>(), {
   start: Date.now(),
 })
 
-const { logs, range } = props
+const { range } = props
+const { log_display: logs } = useLogs()
 const start = ref(props.start)
 const range_ms = ref(parse(range))
 const total_data_points = 150
@@ -39,7 +39,7 @@ const bar_size = computed(() => Math.floor(chart_width.value / total_data_points
 const data = computed(() => {
   // console.log(`Computing data [bucket=${bucket_size.value}] [start=${start.value}] [end=${end.value}]`)
   const bucket_normalize = (ts: number) => normalize(ts, bucket_size.value)
-  const normalized_logs = logs.map(log => ({ ...log, time: bucket_normalize(log.time) }))
+  const normalized_logs = logs.value.map(log => ({ ...log, time: bucket_normalize(log.time) }))
   return Array.from({ length: total_data_points + 30 }, (_, i) => {
     const timestamp = bucket_normalize(now.value - (i * bucket_size.value))
     const matching_logs = normalized_logs.filter(log => log.time === timestamp)

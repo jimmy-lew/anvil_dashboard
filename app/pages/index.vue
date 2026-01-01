@@ -8,15 +8,12 @@ const panelOpen = ref(true)
 const log_header = useTemplateRef('log_header')
 const log_list = useTemplateRef('log_list')
 
-const logs = ref<RawLogItem[]>([])
-// TODO: Higher level log persistence and log filtering based on rolling time window
-const log_stream_client = new LogClient(logs)
+const { log_display: logs } = useLogs()
 
-type Data = typeof logs.value[number]
 const pointer = ref(0)
 const item = computed(() => {
   return logs.value[pointer.value]
-}) as ComputedRef<Data>
+}) as ComputedRef<RawLogItem>
 
 const is_max = computed(() => {
   return pointer.value === (logs.value.length - 1)
@@ -53,9 +50,6 @@ function handle_item_select(index: number) {
 defineShortcuts({
   escape: () => isOpen.value = false,
 })
-
-onMounted(() => { log_stream_client.connect() })
-onUnmounted(() => { log_stream_client.disconnect() })
 </script>
 
 <template>
@@ -82,8 +76,8 @@ onUnmounted(() => { log_stream_client.disconnect() })
     <div class="flex flex-col relative h-full">
       <div class="flex flex-col items-stretch justify-start flex-initial sticky border-b overflow-x-auto">
         <div class="px-3 pt-3">
-          <LogSearch :logs />
-          <LogChart :logs range="1d" />
+          <LogSearch />
+          <LogChart range="1d" />
           <div ref="log_header" class="max-w-screen overflow-x-hidden no-scrollbar">
             <div class="flex flex-row items-center justify-stretch flex-initial text-base h-10 min-w-4xl">
               <div class="pl-5 w-53">

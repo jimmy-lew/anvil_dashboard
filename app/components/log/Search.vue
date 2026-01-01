@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { EllipsisVerticalIcon, FilterIcon, PlayCircleIcon, RefreshCwIcon, SearchIcon } from 'lucide-vue-next'
 
-const { logs } = defineProps<{
-  logs: RawLogItem[]
-}>()
+const { log_display: logs } = useLogs()
 </script>
 
 <template>
