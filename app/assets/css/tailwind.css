@@ -119,6 +119,10 @@
   --vis-tooltip-shadow-color: none !important;
   --vis-tooltip-backdrop-filter: none !important;
   --vis-tooltip-padding: none !important;
+
+  --vis-axis-grid-line-width: 0.5px !important;
+  --vis-axis-tick-color: oklch(0.24 0 0) !important;
+  --vis-dark-axis-tick-color: oklch(0.54 0 0) !important;
 }
 
 .dark {

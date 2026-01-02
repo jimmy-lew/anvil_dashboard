@@ -116,9 +116,4 @@ function normalize(n: number, bucket_size: number): number {
 </template>
 
 <style>
-  :root {
-    --vis-axis-grid-line-width: 0.5px;
-    --vis-axis-tick-color: oklch(0.24 0 0);
-    --vis-dark-axis-tick-color: oklch(0.54 0 0);
-  }
 </style>
