@@ -3,23 +3,11 @@ import { ChevronDown, ChevronUp, Circle, X } from 'lucide-vue-next'
 
 const emit = defineEmits(['close'])
 
-const labels: Record<number, [string, string]> = {
-  10: ['trace', 'text-stone-600'],
-  20: ['debug', 'text-emerald-500'],
-  30: ['info', 'text-sky-500'],
-  40: ['warn', 'text-amber-600'],
-  50: ['error', 'text-red-600'],
-  60: ['fatal', 'text-violet-600'],
-}
-
 const { selectedItem: item, is_max, is_min, increasePointer, decreasePointer } = useLogSelection()
+const { get_label } = useLogLabel()
 
 const date = computed(() => { return item.value ? new Date(item.value.time) : new Date() })
-const default_level = ['unknown', 'text-stone-600']
-const level = computed(() => {
-  const [label, color] = item.value ? labels[item.value.level] ?? default_level : default_level
-  return { label, color }
-})
+const level = computed(() => get_label(item.value?.level))
 
 defineShortcuts({
   ArrowDown: increasePointer,
@@ -29,7 +17,6 @@ defineShortcuts({
 
 <template>
   <Sidebar side="right" class="absolute bg-black border-l h-full">
-    <!-- <Sidebar side="right" class=" bg-black border-l"> -->
     <SidebarHeader class="flex flex-row justify-between bg-black p-4">
       <div class="flex items-center justify-center gap-1 p-1">
         Log
@@ -74,6 +61,6 @@ defineShortcuts({
 
 <style scoped>
 :root {
-  --side-bar-width: max(min(400px,50vw),350px);
+  --sidebar-width: max(min(400px,50vw),350px);
 }
 </style>

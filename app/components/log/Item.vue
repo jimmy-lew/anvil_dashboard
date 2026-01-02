@@ -1,33 +1,17 @@
 <script setup lang="ts">
-interface LogItem {
-  level: number
-  level_label: [string, string]
-  date: Date
-  msg: string
-  metadata: any
-}
-
 const props = defineProps<{
   item: RawLogItem
   index: number
 }>()
 const emit = defineEmits(['select'])
 
-const labels: Record<number, [string, string]> = {
-  10: ['trace', 'text-stone-600'],
-  20: ['debug', 'text-emerald-500'],
-  30: ['info', 'text-sky-500'],
-  40: ['warn', 'text-amber-600'],
-  50: ['error', 'text-red-600'],
-  60: ['fatal', 'text-violet-600'],
-}
-
 const { selectItem } = useLogSelection()
+const { get_label } = useLogLabel()
 
-function parse_log_item(item: RawLogItem): LogItem {
-  const parsed: LogItem = {
+function parse_log_item(item: RawLogItem) {
+  const parsed = {
     level: item.level,
-    level_label: labels[item.level] ?? ['UNKNOWN', ''],
+    level_label: get_label(item.level),
     date: new Date(item.time),
     msg: item.msg,
     metadata: {},
@@ -65,8 +49,8 @@ function handle_item_select() {
           </span>
         </span>
       </div>
-      <div class="w-18 uppercase font-bold" :class="item.level_label[1]">
-        {{ item.level_label[0] }}
+      <div class="w-18 uppercase font-bold" :class="item.level_label.color">
+        {{ item.level_label.label }}
       </div>
       <div class="">
         {{ item.msg }}
