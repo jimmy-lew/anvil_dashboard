@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronUp, Circle, X } from 'lucide-vue-next'
 
-const emit = defineEmits(['update:increasePointer', 'update:decreasePointer', 'close'])
+const emit = defineEmits(['close'])
 
 const labels: Record<number, [string, string]> = {
   10: ['trace', 'text-stone-600'],
@@ -12,7 +12,7 @@ const labels: Record<number, [string, string]> = {
   60: ['fatal', 'text-violet-600'],
 }
 
-const { selectedItem: item, is_max, is_min, increasePointer, decreasePointer } = useLogs()
+const { selectedItem: item, is_max, is_min, increasePointer, decreasePointer } = useLogSelection()
 
 const date = computed(() => { return item.value ? new Date(item.value.time) : new Date() })
 const default_level = ['unknown', 'text-stone-600']
@@ -22,14 +22,8 @@ const level = computed(() => {
 })
 
 defineShortcuts({
-  ArrowDown: () => {
-    emit('update:increasePointer')
-    increasePointer()
-  },
-  ArrowUp: () => {
-    emit('update:decreasePointer')
-    decreasePointer()
-  },
+  ArrowDown: increasePointer,
+  ArrowUp: decreasePointer,
 })
 </script>
 
@@ -45,10 +39,10 @@ defineShortcuts({
           {{ level.label }}
         </Badge>
         <div class="flex flex-row gap-1">
-          <Button :disabled="is_max" :class="is_max ? 'text-muted' : ''" size="icon" variant="ghost" @click="() => emit('update:increasePointer')">
+          <Button :disabled="is_max" :class="is_max ? 'text-muted' : ''" size="icon" variant="ghost" @click="increasePointer">
             <ChevronDown />
           </Button>
-          <Button :disabled="is_min" :class="is_min ? 'text-muted' : ''" size="icon" variant="ghost" @click="() => emit('update:decreasePointer')">
+          <Button :disabled="is_min" :class="is_min ? 'text-muted' : ''" size="icon" variant="ghost" @click="decreasePointer">
             <ChevronUp />
           </Button>
         </div>

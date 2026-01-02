@@ -22,7 +22,7 @@ const labels: Record<number, [string, string]> = {
   60: ['fatal', 'text-violet-600'],
 }
 
-const { selectItem } = useLogs()
+const { selectItem } = useLogSelection()
 
 function parse_log_item(item: RawLogItem): LogItem {
   const parsed: LogItem = {
