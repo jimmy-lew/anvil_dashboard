@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronUp, Circle, X } from 'lucide-vue-next'
 
-const { item } = defineProps<{
-  item: RawLogItem
-  isMax: boolean
-  isMin: boolean
-}>()
-
 const emit = defineEmits(['update:increasePointer', 'update:decreasePointer', 'close'])
 
 const labels: Record<number, [string, string]> = {
@@ -18,21 +12,23 @@ const labels: Record<number, [string, string]> = {
   60: ['fatal', 'text-violet-600'],
 }
 
-const date = computed(() => {
-  return new Date(item.time)
-})
+const { selectedItem: item, is_max, is_min, increasePointer, decreasePointer } = useLogs()
 
+const date = computed(() => { return item.value ? new Date(item.value.time) : new Date() })
+const default_level = ['unknown', 'text-stone-600']
 const level = computed(() => {
-  const [label, color] = (labels[item.level] ?? ['unknown', 'text-stone-600'])
+  const [label, color] = item.value ? labels[item.value.level] ?? default_level : default_level
   return { label, color }
 })
 
 defineShortcuts({
   ArrowDown: () => {
     emit('update:increasePointer')
+    increasePointer()
   },
   ArrowUp: () => {
     emit('update:decreasePointer')
+    decreasePointer()
   },
 })
 </script>
@@ -49,10 +45,10 @@ defineShortcuts({
           {{ level.label }}
         </Badge>
         <div class="flex flex-row gap-1">
-          <Button :disabled="isMax" :class="isMax ? 'text-muted' : ''" size="icon" variant="ghost" @click="() => emit('update:increasePointer')">
+          <Button :disabled="is_max" :class="is_max ? 'text-muted' : ''" size="icon" variant="ghost" @click="() => emit('update:increasePointer')">
             <ChevronDown />
           </Button>
-          <Button :disabled="isMin" :class="isMin ? 'text-muted' : ''" size="icon" variant="ghost" @click="() => emit('update:decreasePointer')">
+          <Button :disabled="is_min" :class="is_min ? 'text-muted' : ''" size="icon" variant="ghost" @click="() => emit('update:decreasePointer')">
             <ChevronUp />
           </Button>
         </div>

@@ -22,6 +22,8 @@ const labels: Record<number, [string, string]> = {
   60: ['fatal', 'text-violet-600'],
 }
 
+const { selectItem } = useLogs()
+
 function parse_log_item(item: RawLogItem): LogItem {
   const parsed: LogItem = {
     level: item.level,
@@ -39,10 +41,15 @@ function parse_log_item(item: RawLogItem): LogItem {
 }
 
 const item = parse_log_item(props.item)
+
+function handle_item_select() {
+  emit('select', props.index)
+  selectItem(props.index)
+}
 </script>
 
 <template>
-  <Button variant="ghost" class="flex h-fit bg-[#111] odd:bg-transparent rounded-[8px] px-0 justify-start" @click="() => { emit('select', index) }">
+  <Button variant="ghost" class="flex h-fit bg-[#111] odd:bg-transparent rounded-[8px] px-0 justify-start" @click="handle_item_select">
     <div class="flex flex-row flex-initial text-muted-foreground text-sm md:text-base text-left md:py-1 pl-7 ">
       <div class="flex items-center space-x-3 w-48">
         <span>

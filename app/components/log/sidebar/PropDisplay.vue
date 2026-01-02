@@ -1,11 +1,11 @@
 <script setup lang="ts">
-defineProps({
-  item: { type: Object, required: true },
-})
+defineProps<{
+  item?: RawLogItem
+}>()
 </script>
 
 <template>
-  <div class="flex flex-col border bg-[#0a0a0a] rounded">
+  <div v-if="item" class="flex flex-col border bg-[#0a0a0a] rounded">
     <div class="flex flex-col px-2 py-1">
       <div class="flex flex-col">
         <div v-for="(v, index) in Object.entries(item)" :key="index" class="border-b py-1 last:border-none">
