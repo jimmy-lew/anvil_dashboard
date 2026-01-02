@@ -1,19 +1,28 @@
 <script setup lang="ts">
-import type { ChartConfig } from '@/components/ui/chart'
+import type { StringValue } from 'ms'
 
+import type { ChartConfig } from '@/components/ui/chart'
 import { VisAxis, VisFreeBrush, VisStackedBar, VisXYContainer } from '@unovis/vue'
-import { parse } from 'ms'
+import { format, parse } from 'ms'
 import { ChartTooltipContent, componentToString } from '@/components/ui/chart'
 
 interface ChartProps {
-  range?: '30m' | '1h' | '3h' | '1d'
+  range?: StringValue
   start?: number
+}
+
+interface Data {
+  date: Date
+  success: number
+  error: number
 }
 
 const props = withDefaults(defineProps<ChartProps>(), {
   range: '1d',
   start: Date.now(),
 })
+
+const emit = defineEmits(['update:rangeChanged'])
 
 const { range } = props
 const { log_display: logs } = useLogs()
@@ -51,8 +60,6 @@ const data = computed(() => {
   })
 })
 
-type Data = typeof data.value[number]
-
 const config = {
   success: { label: 'success', color: '#333' },
   error: { label: 'error', color: '#f85149' },
@@ -64,6 +71,7 @@ function handleBrush(range: [number, number]) {
   const [end, new_start] = range
   range_ms.value = new_start - end
   start.value = new_start
+  emit('update:rangeChanged', range_ms.value, format(range_ms.value))
 }
 
 function normalize(n: number, bucket_size: number): number {
