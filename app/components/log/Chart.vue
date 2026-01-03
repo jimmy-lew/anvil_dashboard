@@ -65,8 +65,8 @@ const config = {
   error: { label: 'error', color: '#f85149' },
 } satisfies ChartConfig
 
-function handleBrush(range: [number, number]) {
-  if (!range)
+function handleBrush(range: [number, number], _: any, user_driven: boolean) {
+  if (!range || !user_driven)
     return
   const [end, new_start] = range
   range_ms.value = new_start - end
