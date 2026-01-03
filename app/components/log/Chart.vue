@@ -6,38 +6,38 @@ import { VisAxis, VisFreeBrush, VisStackedBar, VisXYContainer } from '@unovis/vu
 import { format, parse } from 'ms'
 import { ChartTooltipContent, componentToString } from '@/components/ui/chart'
 
-interface ChartProps {
-  range?: StringValue
-  start?: number
-}
-
 interface Data {
   date: Date
   success: number
   error: number
 }
 
-const props = withDefaults(defineProps<ChartProps>(), {
+const props = withDefaults(defineProps<{
+  range?: StringValue
+  start?: number
+}>(), {
   range: '1d',
   start: Date.now(),
 })
 
 const emit = defineEmits(['update:rangeChanged'])
 
+const THREE_DAY = 3 * 24 * 60 * 60 * 1000
+
 const { range } = props
 const { log_display: logs } = useLogs()
 const start = ref(props.start)
 const range_ms = ref(parse(range))
-const total_data_points = 150
+
+const total_data_points = 180
 const bucket_size = computed(() => {
-  const size = normalize(range_ms.value / total_data_points, 1000)
+  const size = parse(format(normalize(range_ms.value / total_data_points, 1000)))
   return size > 1000 ? size : 1000
 })
 
 // BUG: New values don't show up if the range isn't updated
-const offset = computed(() => 10 * bucket_size.value)
-const now = computed(() => normalize(start.value + offset.value, bucket_size.value))
-const end = computed(() => now.value - range_ms.value - (2 * offset.value))
+const now = computed(() => normalize(start.value + (10 * bucket_size.value), bucket_size.value))
+// const end = computed(() => normalize(start.value - range_ms.value + offset.value, bucket_size.value))
 const { width: window_width } = useWindowSize()
 const chart_width = computed(() => {
   const width = window_width.value - (window_width.value > 768 ? 270 : 0) - 28
@@ -49,7 +49,7 @@ const data = computed(() => {
   // console.log(`Computing data [bucket=${bucket_size.value}] [start=${start.value}] [end=${end.value}]`)
   const bucket_normalize = (ts: number) => normalize(ts, bucket_size.value)
   const normalized_logs = logs.value.map(log => ({ ...log, time: bucket_normalize(log.time) }))
-  return Array.from({ length: total_data_points + 30 }, (_, i) => {
+  return Array.from({ length: total_data_points + 1 }, (_, i) => {
     const timestamp = bucket_normalize(now.value - (i * bucket_size.value))
     const matching_logs = normalized_logs.filter(log => log.time === timestamp)
     const aggregate = matching_logs.reduce((agg, log) => {
@@ -61,8 +61,8 @@ const data = computed(() => {
 })
 
 const config = {
-  success: { label: 'success', color: '#333' },
   error: { label: 'error', color: '#f85149' },
+  success: { label: 'success', color: '#333' },
 } satisfies ChartConfig
 
 function handleBrush(range: [number, number], _: any, user_driven: boolean) {
@@ -77,22 +77,30 @@ function handleBrush(range: [number, number], _: any, user_driven: boolean) {
 function normalize(n: number, bucket_size: number): number {
   return Math.floor(n / bucket_size) * bucket_size
 }
+
+const ticks = computed(() => {
+  const tick_bucket_size = parse(format(normalize(range_ms.value / 6, 1000)))
+  const ticks = []
+  for (let i = 0; i < 7; i++) {
+    const timestamp = now.value - (i * tick_bucket_size)
+    ticks.push(new Date(timestamp))
+  }
+  return ticks
+})
 </script>
 
 <template>
-  <ChartContainer :config="config" class="aspect-auto h-13.5 w-full custom-vis" cursor>
+  <ChartContainer :config="config" class="aspect-auto h-13.5 w-full" cursor>
     <VisXYContainer
       :data
-      :x-domain="[end, now]"
       :y-domain="[0, 10]"
-      :scale-by-domain="true"
       :y-axis="{ showLabels: false }"
       color="#666"
     >
       <VisStackedBar
-        :x="(d: Data) => Math.round(d.date.getTime() / 10_000) * 10_000"
-        :y="[(d: Data) => d.success, (d: Data) => d.error]"
-        :color="['#333', '#f85149']"
+        :x="(d: Data) => d.date.getTime()"
+        :y="[(d: Data) => d.error, (d: Data) => d.success]"
+        :color="['#f85149', '#333']"
         :bar-width="bar_size"
         :rounded-corners="false"
       />
@@ -100,11 +108,13 @@ function normalize(n: number, bucket_size: number): number {
         type="x"
         :x="(d: Data) => d.date.getTime()"
         :grid-line="false"
+        :tick-values="ticks"
         :tick-format="(d: number) => {
           const date = new Date(d)
-          return date.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+          return range_ms > THREE_DAY
+            ? date.toLocaleDateString('en-SG', { month: 'short', day: '2-digit' })
+            : date.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
         }"
-        :num-ticks="4"
       />
       <VisFreeBrush :on-brush-end="handleBrush" />
       <ChartTooltip />
@@ -113,8 +123,10 @@ function normalize(n: number, bucket_size: number): number {
           labelKey: 'success',
           indicator: 'line',
           labelFormatter(d) {
-            const ts = Math.round(new Date(d).getTime() / 10_000) * 10_000
-            return new Date(ts).toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+            const date = new Date(normalize(new Date(d).getTime(), bucket_size))
+            return range_ms > THREE_DAY
+              ? date.toLocaleDateString('en-SG', { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+              : date.toLocaleTimeString('en-SG', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
           },
         })"
         color="#0000"
