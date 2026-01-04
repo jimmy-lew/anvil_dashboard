@@ -8,6 +8,7 @@ const log_header = useTemplateRef('log_header')
 const log_list = useTemplateRef('log_list')
 
 const { log_display: logs } = useLogs()
+const { isFiltersActive } = useLogFilters()
 
 function handle_scroll() {
   if (!log_header.value || !log_list.value)
@@ -21,31 +22,13 @@ defineShortcuts({
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-[270px_calc(100%-270px)] h-full relative">
-    <div class="hidden md:block dark:bg-black border-r relative h-full">
-      <div class="sticky">
-        <div class="flex flex-col h-full p-3">
-          <div class="flex flex-initial items-center justify-between">
-            <span class="text-base p-3">
-              Filters
-            </span>
-            <Button variant="outline">
-              Reset
-            </Button>
-          </div>
-          <div class="flex flex-col pt-2">
-            <LogFiltersTime />
-            <LogFiltersLevels />
-            <LogFiltersEnvironment />
-          </div>
-        </div>
-      </div>
-    </div>
+  <div class="grid h-full relative" :class="isFiltersActive ? 'grid-cols-1 md:grid-cols-[270px_calc(100%-270px)]' : 'grid-cols-1'">
+    <LogFilters v-if="isFiltersActive" />
     <div class="flex flex-col relative h-full">
       <div class="flex flex-col items-stretch justify-start flex-initial sticky border-b overflow-x-auto">
         <div class="px-3 pt-3">
           <LogSearch />
-          <LogChart range="10m" />
+          <LogChart range="2h" />
           <div ref="log_header" class="max-w-screen overflow-x-hidden no-scrollbar">
             <div class="flex flex-row items-center justify-stretch flex-initial text-base h-10 min-w-4xl">
               <div class="pl-5 w-53">
@@ -62,7 +45,7 @@ defineShortcuts({
         </div>
       </div>
       <div ref="log_list" class="relative overflow-x-auto md:overflow-x-hidden flex-[1_1_0%]" @scroll.passive="handle_scroll">
-        <ol reversed class="flex flex-col items-stretch justify-start flex-auto px-1 min-w-4xl h-full">
+        <ol class="flex flex-col items-stretch justify-start flex-auto px-1 min-w-4xl h-full">
           <LogItem v-for="(log_item, index) in logs" :key="log_item.log_id" :item="log_item" :index @select="isOpen = true" />
         </ol>
         <SidebarProvider v-model:open="isOpen" class="min-h-0" style="--sidebar-width: max(min(400px,50vw), 350px);">

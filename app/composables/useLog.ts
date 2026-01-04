@@ -30,6 +30,17 @@ export const useLogStream = createSharedComposable((url?: string, cap: number = 
   return { buffer, bg_count }
 })
 
+export function useLogFilters() {
+  const isFiltersActive = useState('log-filters-active', () => true)
+
+  const toggle_filters = () => { isFiltersActive.value = !isFiltersActive.value }
+
+  return {
+    isFiltersActive,
+    toggle_filters,
+  }
+}
+
 export function useLogs(url?: string, cap: number = 1000) {
   const { buffer, bg_count } = useLogStream(url, cap)
 
