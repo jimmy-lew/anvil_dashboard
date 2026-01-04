@@ -26,6 +26,7 @@ const THREE_DAY = 3 * 24 * 60 * 60 * 1000
 
 const { range } = props
 const { log_display: logs } = useLogs()
+const data = computed(() => agg_logs(logs.value))
 const start = ref(props.start)
 const range_ms = ref(parse(range))
 
@@ -35,9 +36,7 @@ const bucket_size = computed(() => {
   return size > 1000 ? size : 1000
 })
 
-// BUG: New values don't show up if the range isn't updated
 const now = computed(() => normalize(start.value + (10 * bucket_size.value), bucket_size.value))
-// const end = computed(() => normalize(start.value - range_ms.value + offset.value, bucket_size.value))
 const { width: window_width } = useWindowSize()
 const chart_width = computed(() => {
   const width = window_width.value - (window_width.value > 768 ? 270 : 0) - 28
@@ -45,10 +44,9 @@ const chart_width = computed(() => {
 })
 const bar_size = computed(() => Math.floor(chart_width.value / total_data_points) - 2)
 
-const data = computed(() => {
-  // console.log(`Computing data [bucket=${bucket_size.value}] [start=${start.value}] [end=${end.value}]`)
+function agg_logs(logs: RawLogItem[]) {
   const bucket_normalize = (ts: number) => normalize(ts, bucket_size.value)
-  const normalized_logs = logs.value.map(log => ({ ...log, time: bucket_normalize(log.time) }))
+  const normalized_logs = logs.map(log => ({ ...log, time: bucket_normalize(log.time) }))
   return Array.from({ length: total_data_points + 1 }, (_, i) => {
     const timestamp = bucket_normalize(now.value - (i * bucket_size.value))
     const matching_logs = normalized_logs.filter(log => log.time === timestamp)
@@ -58,7 +56,11 @@ const data = computed(() => {
     }, { date: new Date(timestamp), success: 0, error: 0 })
     return aggregate
   })
-})
+}
+
+watch(logs, () => {
+  start.value = Date.now()
+}, { immediate: true })
 
 const config = {
   error: { label: 'error', color: '#f85149' },
