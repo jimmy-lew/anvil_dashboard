@@ -72,7 +72,16 @@ export default defineNuxtConfig({
     dirs: [
       './lib',
       './types',
+      '~~/lib',
     ],
+  },
+
+  nitro: {
+    imports: {
+      dirs: [
+        'lib',
+      ],
+    },
   },
 
   compatibilityDate: '2026-12-25',
