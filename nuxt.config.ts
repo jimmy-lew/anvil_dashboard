@@ -40,6 +40,15 @@ export default defineNuxtConfig({
     componentDir: '~/components/ui',
   },
 
+  icon: {
+    customCollections: [
+      {
+        prefix: 'local',
+        dir: './app/assets/icons',
+      },
+    ],
+  },
+
   colorMode: {
     classSuffix: '',
   },
