@@ -13,7 +13,7 @@ defineProps<{
       <div class="absolute inset-0 bg-zinc-900" />
       <div class="relative z-20 flex items-center text-lg font-medium">
         <img src="/icon.svg" class="mr-2 h-6 w-6">
-        Acme Inc
+        Anvil
       </div>
       <div class="relative z-20 mt-auto">
         <blockquote class="space-y-2">
