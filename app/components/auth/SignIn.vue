@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Loader2 } from 'lucide-vue-next'
 
+const { signIn } = useAuth()
+
 const email = ref('demo@gmail.com')
 const isLoading = ref(false)
 
