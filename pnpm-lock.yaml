@@ -20,9 +20,6 @@ importers:
       '@libsql/client':
         specifier: ^0.15.15
         version: 0.15.15
-      '@libsql/darwin-arm64':
-        specifier: ^0.5.22
-        version: 0.5.22
       '@number-flow/vue':
         specifier: ^0.4.8
         version: 0.4.8(vue@3.5.22(typescript@5.9.3))
@@ -165,6 +162,13 @@ importers:
       zod:
         specifier: ^4.3.4
         version: 4.3.4
+    optionalDependencies:
+      '@libsql/darwin-arm64':
+        specifier: ^0.5.22
+        version: 0.5.22
+      '@libsql/linux-x64-musl':
+        specifier: ^0.5.22
+        version: 0.5.22
 
 packages:
 
@@ -1078,6 +1082,7 @@ packages:
 
   '@libsql/darwin-arm64@0.5.22':
     resolution: {integrity: sha512-4B8ZlX3nIDPndfct7GNe0nI3Yw6ibocEicWdC4fvQbSs/jdq/RC2oCsoJxJ4NzXkvktX70C1J4FcmmoBy069UA==}
+    cpu: [arm64]
     os: [darwin]
 
   '@libsql/darwin-x64@0.5.22':
@@ -7674,7 +7679,8 @@ snapshots:
     dependencies:
       js-base64: 3.7.8
 
-  '@libsql/darwin-arm64@0.5.22': {}
+  '@libsql/darwin-arm64@0.5.22':
+    optional: true
 
   '@libsql/darwin-x64@0.5.22':
     optional: true

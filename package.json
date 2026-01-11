@@ -46,8 +46,6 @@
     "@iconify-json/radix-icons": "^1.2.5",
     "@internationalized/date": "^3.10.0",
     "@libsql/client": "^0.15.15",
-    "@libsql/darwin-arm64": "^0.5.22",
-    "@number-flow/vue": "^0.4.8",
     "@tailwindcss/vite": "^4.1.14",
     "@tanstack/vue-table": "^8.21.3",
     "@unovis/ts": "^1.6.1",
@@ -56,14 +54,16 @@
     "drizzle-orm": "^0.45.1",
     "embla-carousel": "^8.6.0",
     "embla-carousel-vue": "^8.6.0",
-    "eventsource": "^4.1.0",
-    "luxon": "^3.7.2",
     "motion-v": "^1.7.4",
     "ms": "3.0.0-canary.202508261828",
     "nanoid": "^5.1.6",
     "reka-ui": "^2.5.1",
     "tailwindcss": "^4.1.14",
     "vuedraggable": "^4.1.0"
+  },
+  "optionalDependencies": {
+    "@libsql/darwin-arm64": "^0.5.22",
+    "@libsql/linux-x64-musl": "^0.5.22"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.19.0",
