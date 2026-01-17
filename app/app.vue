@@ -48,7 +48,8 @@ defineShortcuts({
 
 const textDirection = useTextDirection({ initialValue: 'ltr' })
 const dir = computed(() => textDirection.value === 'rtl' ? 'rtl' : 'ltr')
-useLogs('http://localhost:3333')
+
+useLogs()
 </script>
 
 <template>

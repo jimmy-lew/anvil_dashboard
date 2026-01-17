@@ -1,4 +1,4 @@
-export const useLogStream = createSharedComposable((url?: string, cap: number = 1000) => {
+export const useLogStream = createSharedComposable((cap: number = 1000) => {
   const buffer = useState('logs-buffer', () => shallowRef<RawLogItem[]>([]))
   const bg_count = computed(() => buffer.value.length)
 
@@ -12,7 +12,7 @@ export const useLogStream = createSharedComposable((url?: string, cap: number = 
     buffer.value = data
   }, { immediate: true })
 
-  const { data } = url ? useEventSource(url) : { data: ref(null) }
+  const { data } = useEventSource('/api/stream/logs')
 
   watch(data, (new_data) => {
     if (!new_data)
@@ -20,9 +20,6 @@ export const useLogStream = createSharedComposable((url?: string, cap: number = 
     try {
       const parsed = JSON.parse(new_data)
       buffer.value = [parsed, ...buffer.value].slice(0, cap)
-
-      // Fire and forget to cache logs
-      $fetch('/api/logs', { method: 'POST', body: parsed }).catch(() => {})
     }
     catch { }
   })
@@ -41,13 +38,17 @@ export function useLogFilters() {
   }
 }
 
-export function useLogs(url?: string, cap: number = 1000) {
-  const { buffer, bg_count } = useLogStream(url, cap)
+export function useLogs(cap: number = 1000) {
+  const { buffer, bg_count } = useLogStream(cap)
 
   const pause_count = ref(0)
   const is_paused = useState('logs-paused', () => false)
 
-  const log_display = computed(() => is_paused.value ? buffer.value.slice(bg_count.value - pause_count.value) : buffer.value)
+  const log_display = computed(() => {
+    return (is_paused.value ? buffer.value.slice(bg_count.value - pause_count.value) : buffer.value).filter((_) => {
+      return true
+    })
+  })
 
   const toggle_pause = () => {
     is_paused.value = !is_paused.value
