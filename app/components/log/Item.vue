@@ -1,19 +1,17 @@
 <script setup lang="ts">
-const props = defineProps<{
-  item: RawLogItem
-  index: number
-}>()
+const props = defineProps<{ item: RawLogItem, index: number }>()
 const emit = defineEmits(['select'])
 
 const { selectItem } = useLogSelection()
 const { get_label } = useLogLabel()
 
-function parse_log_item(item: RawLogItem) {
+function parse(item: RawLogItem) {
+  const msg = item.msg ?? item.content ?? item.event_name
   const parsed = {
     level: item.level,
     level_label: get_label(item.level),
     date: new Date(item.time),
-    msg: item.msg,
+    msg,
     metadata: {},
   }
   for (const [key, prop] of Object.entries(item)) {
@@ -24,11 +22,12 @@ function parse_log_item(item: RawLogItem) {
   return parsed
 }
 
-const item = parse_log_item(props.item)
+const item = parse(props.item)
 
 function handle_item_select() {
   emit('select', props.index)
   selectItem(props.index)
+  console.log(props.item)
 }
 </script>
 
