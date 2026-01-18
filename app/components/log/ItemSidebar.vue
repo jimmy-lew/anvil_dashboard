@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ChevronDown, ChevronUp, Circle, X } from 'lucide-vue-next'
 
-const emit = defineEmits(['close'])
+const isOpen = defineModel('open', { type: Boolean, default: false })
 
 const { selectedItem: item, is_max, is_min, increasePointer, decreasePointer } = useLogSelection()
 const { get_label } = useLogLabel()
@@ -16,8 +16,11 @@ defineShortcuts({
 </script>
 
 <template>
-  <Sidebar side="right" class="absolute bg-black border-l h-full">
-    <SidebarHeader class="flex flex-row justify-between bg-black p-4">
+  <div
+    :class="isOpen ? 'right-0' : '-right-(--sb-width)'"
+    class="fixed top-51 bg-black border-l h-full w-(--sb-width) transition-all ease-in-out duration-200"
+  >
+    <div class="flex flex-row justify-between bg-black p-4">
       <div class="flex items-center justify-center gap-1 p-1">
         Log
       </div>
@@ -34,12 +37,12 @@ defineShortcuts({
           </Button>
         </div>
         <Separator orientation="vertical" />
-        <Button size="icon" variant="ghost" @click="() => emit('close')">
+        <Button size="icon" variant="ghost" @click="isOpen = false">
           <X />
         </Button>
       </div>
-    </SidebarHeader>
-    <SidebarContent class="bg-black">
+    </div>
+    <div class="flex min-h-0 flex-1 flex-col gap-2 overflow-auto group-data-[collapsible=icon]:overflow-hidden bg-black">
       <div class="flex-1 overflow-y-auto">
         <div class="flex flex-col items-stretch justify-start flex-initial min-h-full pb-4">
           <div class="flex-1 px-3">
@@ -55,12 +58,9 @@ defineShortcuts({
           </div>
         </div>
       </div>
-    </SidebarContent>
-  </Sidebar>
+    </div>
+  </div>
 </template>
 
 <style scoped>
-:root {
-  --sidebar-width: max(min(400px,50vw),350px);
-}
 </style>
