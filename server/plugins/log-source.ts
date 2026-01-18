@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import type { RawLogItem } from '~/types/log'
 import { Buffer } from 'node:buffer'
 import http from 'node:http'
 import https from 'node:https'
@@ -70,7 +71,7 @@ class LogSourceClient {
       return
     try {
       const jsonStr = line.slice(6)
-      const data = this.flattenJSON(JSON.parse(jsonStr))
+      const data = this.flattenJSON(JSON.parse(jsonStr)) as RawLogItem
       cache_log(data)
       broadcast(data)
     }
