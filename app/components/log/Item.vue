@@ -27,7 +27,6 @@ const item = parse(props.item)
 function handle_item_select() {
   emit('select', props.index)
   selectItem(props.index)
-  console.log(props.item)
 }
 </script>
 
