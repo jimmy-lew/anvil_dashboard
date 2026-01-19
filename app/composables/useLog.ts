@@ -38,7 +38,7 @@ export function useLogFilters() {
   }
 }
 
-export function useLogs(cap: number = 1000) {
+function _useLogs(cap: number = 1000) {
   const { buffer, bg_count } = useLogStream(cap)
 
   const pause_count = ref(0)
@@ -63,3 +63,5 @@ export function useLogs(cap: number = 1000) {
     log_display,
   }
 }
+
+export const useLogs = createSharedComposable(_useLogs)
