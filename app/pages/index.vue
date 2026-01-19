@@ -4,8 +4,8 @@ const isOpen = ref(false)
 const log_header = useTemplateRef('log_header')
 const log_list = useTemplateRef('log_list')
 
-const { log_display: logs } = useLogs()
-const { isFiltersActive } = useLogFilters()
+const { log_display: logs, toggle_pause } = useLogs()
+const { isFiltersActive, toggle_filters } = useLogFilters()
 
 function handle_scroll() {
   if (!log_header.value || !log_list.value)
@@ -14,7 +14,10 @@ function handle_scroll() {
 }
 
 defineShortcuts({
-  escape: () => isOpen.value = false,
+  'escape': () => isOpen.value = false,
+  '[': () => toggle_filters(),
+  ']': () => isOpen.value = !isOpen.value,
+  ' ': () => toggle_pause(),
 })
 </script>
 

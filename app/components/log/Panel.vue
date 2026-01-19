@@ -2,9 +2,13 @@
 import { ChevronDownIcon } from 'lucide-vue-next'
 
 const isOpen = defineModel('open', { type: Boolean, default: false })
-const isPanelOpen = ref(true)
+const isPanelOpen = ref(false)
 
 const { isFiltersActive } = useLogFilters()
+
+defineShortcuts({
+  '\\': () => isPanelOpen.value = !isPanelOpen.value,
+})
 </script>
 
 <template>

@@ -4,7 +4,9 @@ import { Toaster } from '@/components/ui/sonner'
 import 'vue-sonner/style.css'
 
 const colorMode = useColorMode()
-const color = computed(() => colorMode.value === 'dark' ? '#09090b' : '#ffffff')
+const color = computed(() =>
+  colorMode.value === 'dark' ? '#09090b' : '#ffffff',
+)
 const { theme } = useAppSettings()
 
 useHead({
@@ -13,14 +15,15 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { key: 'theme-color', name: 'theme-color', content: color },
   ],
-  link: [
-    { rel: 'icon', href: '/favicon.png' },
-  ],
+  link: [{ rel: 'icon', href: '/favicon.png' }],
   htmlAttrs: {
     lang: 'en',
   },
   bodyAttrs: {
-    class: computed(() => `color-${theme.value?.color || 'default'} theme-${theme.value?.type || 'default'}`),
+    class: computed(
+      () =>
+        `color-${theme.value?.color || 'default'} theme-${theme.value?.type || 'default'}`,
+    ),
   },
 })
 
@@ -47,7 +50,7 @@ defineShortcuts({
 })
 
 const textDirection = useTextDirection({ initialValue: 'ltr' })
-const dir = computed(() => textDirection.value === 'rtl' ? 'rtl' : 'ltr')
+const dir = computed(() => (textDirection.value === 'rtl' ? 'rtl' : 'ltr'))
 
 useLogs()
 </script>
@@ -61,7 +64,7 @@ useLogs()
         </NuxtLayout>
       </div>
 
-      <Toaster :theme="colorMode.preference as any || 'system'" />
+      <Toaster :theme="(colorMode.preference as any) || 'system'" />
     </ConfigProvider>
   </Body>
 </template>

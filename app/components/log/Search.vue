@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import { CircleStopIcon, EllipsisVerticalIcon, FilterIcon, PlayCircleIcon, RefreshCwIcon, SearchIcon } from 'lucide-vue-next'
 
-const { log_display: logs } = useLogs()
+const { log_display: logs, is_paused } = useLogs()
 const { toggle_filters } = useLogFilters()
 const is_live = ref(true)
+
+defineShortcuts({
+  r: () => window.location.reload(),
+})
 </script>
 
 <template>
@@ -34,13 +38,13 @@ const is_live = ref(true)
       </Button>
       <LogDownload class="md:hidden" />
       <div class="flex-1 md:hidden" />
-      <Button variant="outline" :class="is_live ? 'text-primary border-primary!' : ''">
-        <CircleStopIcon v-if="is_live" />
+      <Button variant="outline" :class="!is_paused ? 'text-primary border-primary!' : ''">
+        <CircleStopIcon v-if="!is_paused" />
         <PlayCircleIcon v-else />
         Live
       </Button>
       <Button variant="outline" size="icon">
-        <RefreshCwIcon :class="is_live ? 'animate-spin' : ''" />
+        <RefreshCwIcon :class="!is_paused ? 'animate-spin' : ''" />
       </Button>
       <Button variant="outline" size="icon">
         <EllipsisVerticalIcon />

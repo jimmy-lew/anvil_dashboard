@@ -29,7 +29,7 @@ const labels: Record<number, [string, string]> = {
         </Button>
       </CollapsibleTrigger>
     </div>
-    <CollapsibleContent class="flex flex-col text-base border mb-2 rounded">
+    <CollapsibleContent class="flex flex-col text-base border mb-2 rounded data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down transition-all duration-100">
       <div v-for="(log_level, index) in labels" :key="index" class="flex items-center gap-3 py-1 px-2 not-last:border-b">
         <Checkbox id="trace" />
         <Label for="trace" class="leading-7 ml-1 capitalize">{{ log_level[0] }}</Label>
