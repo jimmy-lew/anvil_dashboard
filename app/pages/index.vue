@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const isOpen = ref(true)
+const isOpen = ref(false)
 
 const log_header = useTemplateRef('log_header')
 const log_list = useTemplateRef('log_list')
@@ -19,13 +19,19 @@ defineShortcuts({
 </script>
 
 <template>
-  <div
-    class="grid h-full relative"
-    :class="isFiltersActive ? 'grid-cols-1 md:grid-cols-[270px_calc(100%-270px)]' : 'grid-cols-[0px_100%]'"
-  >
-    <LogFilters />
-    <div class="flex flex-col relative h-full overflow-hidden">
-      <div class="fixed top-[calc(--header-height+8px)] z-50 w-full bg-background flex flex-col items-stretch justify-start flex-initial border-b overflow-x-auto">
+  <div class="flex h-full relative overflow-hidden">
+    <Motion
+      :initial="{ width: '270px', opacity: 1 }"
+      :animate="{ width: isFiltersActive ? '270px' : '0px', opacity: isFiltersActive ? 1 : 0 }"
+      :transition="{ type: 'spring', stiffness: 300, damping: 30 }"
+      class="border-r dark:bg-black overflow-hidden"
+    >
+      <div class="w-[270px] h-full">
+        <LogFilters />
+      </div>
+    </Motion>
+    <div class="flex flex-col relative h-full overflow-hidden flex-1 min-w-0">
+      <div class="absolute top-[calc(--header-height+8px)] z-50 w-full bg-background flex flex-col items-stretch justify-start flex-initial border-b overflow-x-auto">
         <div class="px-3 pt-3">
           <LogSearch />
           <LogChart range="6h" />

@@ -16,9 +16,11 @@ defineShortcuts({
 </script>
 
 <template>
-  <div
-    :class="isOpen ? 'right-0' : '-right-(--sb-width)'"
-    class="fixed top-51 bg-black border-l h-full w-(--sb-width) transition-all ease-in-out duration-200"
+  <Motion
+    :initial="{ x: '100%' }"
+    :animate="{ x: isOpen ? 0 : '100%' }"
+    :transition="{ type: 'spring', stiffness: 300, damping: 30 }"
+    class="fixed top-51 right-0 bg-black border-l h-full w-(--sb-width)"
   >
     <div class="flex flex-row justify-between bg-black p-4">
       <div class="flex items-center justify-center gap-1 p-1">
@@ -59,7 +61,7 @@ defineShortcuts({
         </div>
       </div>
     </div>
-  </div>
+  </Motion>
 </template>
 
 <style scoped>

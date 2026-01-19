@@ -5,10 +5,10 @@ const open = ref(false)
 <template>
   <SidebarProvider :default-open="open">
     <!-- <LayoutAppSidebar /> -->
-    <SidebarInset>
+    <SidebarInset class="h-screen overflow-hidden">
       <LayoutHeader />
-      <div class="flex flex-col flex-1">
-        <div class="@container/main grow">
+      <div class="flex flex-col flex-1 min-h-0">
+        <div class="@container/main grow min-h-0">
           <slot />
         </div>
       </div>
