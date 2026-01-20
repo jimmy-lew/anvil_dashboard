@@ -26,7 +26,9 @@ const THREE_DAY = 3 * 24 * 60 * 60 * 1000
 
 const { range } = props
 const { log_display: logs } = useLogs()
-const data = computed(() => agg_logs(logs.value))
+const chartData = computed(() => agg_logs(logs.value))
+const data = computed(() => chartData.value.data)
+const yDomain = computed(() => [0, Math.round(chartData.value.max * 1.2)])
 const start = ref(props.start)
 const range_ms = ref(parse(range))
 
@@ -47,15 +49,25 @@ const bar_size = computed(() => Math.floor(chart_width.value / total_data_points
 function agg_logs(logs: RawLogItem[]) {
   const bucket_normalize = (ts: number) => normalize(ts, bucket_size.value)
   const normalized_logs = logs.map(log => ({ ...log, time: bucket_normalize(log.time) }))
-  return Array.from({ length: total_data_points + 1 }, (_, i) => {
+
+  let max = 0
+
+  const data = Array.from({ length: total_data_points + 1 }, (_, i) => {
     const timestamp = bucket_normalize(now.value - (i * bucket_size.value))
     const matching_logs = normalized_logs.filter(log => log.time === timestamp)
     const aggregate = matching_logs.reduce((agg, log) => {
       agg[log.level < 50 ? 'success' : 'error'] += 1
       return agg
     }, { date: new Date(timestamp), success: 0, error: 0 })
+
+    const total = aggregate.success + aggregate.error
+    if (total > max)
+      max = total
+
     return aggregate
   })
+
+  return { data, max }
 }
 
 watch(logs, () => {
@@ -95,7 +107,7 @@ const ticks = computed(() => {
   <ChartContainer :config="config" class="aspect-auto h-13.5 w-full" cursor>
     <VisXYContainer
       :data
-      :y-domain="[0, 10]"
+      :y-domain="yDomain"
       :y-axis="{ showLabels: false }"
       color="#666"
     >
