@@ -3,10 +3,18 @@ import { CircleStopIcon, EllipsisVerticalIcon, FilterIcon, PlayCircleIcon, Refre
 
 const { log_display: logs, is_paused } = useLogs()
 const { toggle_filters } = useLogFilters()
-const is_live = ref(true)
+
+const searchInput = ref()
+const isOpen = ref(false)
 
 defineShortcuts({
-  r: () => window.location.reload(),
+  'r': () => window.location.reload(),
+  '/': () => {
+    isOpen.value = true
+    const el = searchInput.value?.$el as HTMLInputElement | undefined
+    if (el)
+      el.focus()
+  },
 })
 </script>
 
@@ -17,17 +25,34 @@ defineShortcuts({
         <FilterIcon />
       </Button>
       <LogDownload class="hidden md:inline-flex" />
-      <Popover class="relative">
-        <PopoverTrigger class="relative inline-flex w-full">
+      <Popover v-model:open="isOpen" class="relative">
+        <PopoverAnchor as-child>
           <InputGroup>
-            <InputGroupInput :placeholder="`${logs.length} logs found...`" />
+            <InputGroupInput
+              ref="searchInput"
+              :placeholder="`${logs.length} logs found...`"
+              @focus="isOpen = true"
+              @click="isOpen = true"
+              @keydown.escape="(e: KeyboardEvent) => {
+                isOpen = false;
+                (e.target as HTMLInputElement).blur()
+              }"
+            />
             <InputGroupAddon>
               <SearchIcon :size="16" />
               <!-- <LucideLoader2 :size="16" class="animate-spin" /> -->
             </InputGroupAddon>
           </InputGroup>
-        </PopoverTrigger>
-        <PopoverContent class="w-(--reka-popper-anchor-width)! bg-black border">
+        </PopoverAnchor>
+        <PopoverContent
+          class="w-(--reka-popper-anchor-width)! bg-black border"
+          @close-auto-focus.prevent
+          @escape-key-down="() => {
+            // Backup handler in case focus is not on input
+            const el = searchInput?.$el as HTMLInputElement | undefined
+            el?.blur()
+          }"
+        >
           Placeholder
         </PopoverContent>
       </Popover>
@@ -44,7 +69,8 @@ defineShortcuts({
         Live
       </Button>
       <Button variant="outline" size="icon">
-        <RefreshCwIcon :class="!is_paused ? 'animate-spin' : ''" />
+        <!-- Used for when data might be stale and need to refresh connection to server -->
+        <RefreshCwIcon />
       </Button>
       <Button variant="outline" size="icon">
         <EllipsisVerticalIcon />
