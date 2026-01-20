@@ -5,12 +5,17 @@ export default defineEventHandler(async (event) => {
     'Connection': 'keep-alive',
   })
 
-  addClient(event)
-
-  event.node.req.on('close', () => {
-    removeClient(event)
+  const stream = new ReadableStream({
+    start(controller) {
+      const listener = (data) => {
+        controller.enqueue(`data: ${JSON.stringify(data)}\n\n`)
+      }
+      logBus.on('log', listener)
+      event.node.req.on('close', () => {
+        logBus.off('log', listener)
+      })
+    },
   })
 
-  // Keep the connection open
-  return new Promise(() => {})
+  return stream
 })

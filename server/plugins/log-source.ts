@@ -1,48 +1,33 @@
 /* eslint-disable no-console */
+import type { Server, Socket } from 'node:net'
 import type { RawLogItem } from '~/types/log'
 import { Buffer } from 'node:buffer'
-import http from 'node:http'
-import https from 'node:https'
+import { createServer } from 'node:net'
 
+// Handle server going down and reconnecting once it's back up
 class LogSourceClient {
-  private url: string
-  private retryDelay: number
+  private port: number = 9000
   private buffer: Buffer
   private separator: Buffer
+  private server: Server
 
-  constructor(url: string) {
-    this.url = url
-    this.retryDelay = 3000
+  constructor() {
     this.buffer = Buffer.alloc(0)
     // SSE messages are typically separated by double newline
-    this.separator = Buffer.from('\n\n')
+    this.separator = Buffer.from('\n')
+    this.server = createServer(socket => this.handleSocket(socket))
   }
 
   start() {
-    this.connect()
+    this.server.listen(this.port, '127.0.0.1', () => {
+      console.log(`Log source server listening on port ${this.port}`)
+    })
   }
 
-  private connect() {
-    console.log('Connecting to log source...', this.url)
-    const protocol = this.url.startsWith('https') ? https : http
-
-    const req = protocol.get(this.url, (res) => {
-      if (res.statusCode !== 200) {
-        console.error(`Failed to connect: ${res.statusCode} ${res.statusMessage}`)
-        res.resume()
-        this.reconnect()
-        return
-      }
-
-      // Disable timeout on the socket to allow long-lived connections
-      res.socket?.setTimeout(0)
-
-      res.on('data', chunk => this.handleChunk(chunk))
-      res.on('end', () => { this.reconnect() })
-    })
-
-    req.on('error', (err) => { this.reconnect(err) })
-    req.setTimeout(0)
+  private handleSocket(socket: Socket) {
+    console.log(`Handling socket connection`, socket.remoteAddress)
+    const listener = (chunk: Buffer) => this.handleChunk(chunk)
+    socket.on('data', listener)
   }
 
   private handleChunk(chunk: Buffer) {
@@ -67,13 +52,11 @@ class LogSourceClient {
 
   private processMessage(bytes: Buffer) {
     const line = bytes.toString('utf-8')
-    if (!line.startsWith('data: '))
-      return
     try {
-      const jsonStr = line.slice(6)
-      const data = this.flattenJSON(JSON.parse(jsonStr)) as RawLogItem
+      const data = this.flattenJSON(JSON.parse(line)) as RawLogItem
+      console.log(`Processing log ${data.log_id}`)
       cache_log(data)
-      broadcast(data)
+      logBus.emit('log', data)
     }
     catch (e) {
       console.error('Error parsing log data:', e)
@@ -93,20 +76,9 @@ class LogSourceClient {
     Object.entries(obj).map(handleKVPair)
     return result
   }
-
-  private reconnect(err?: Error) {
-    if (err) {
-      console.error('Log source connection error:', err)
-    }
-    else {
-      console.log('Log source connection closed. Reconnecting...')
-    }
-    setTimeout(() => this.connect(), this.retryDelay)
-  }
 }
 
 export default defineNitroPlugin((_) => {
-  const config = useRuntimeConfig()
-  const client = new LogSourceClient(config.logSourceUrl)
+  const client = new LogSourceClient()
   client.start()
 })
