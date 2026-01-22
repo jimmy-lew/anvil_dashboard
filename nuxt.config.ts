@@ -4,14 +4,13 @@ export default defineNuxtConfig({
   ssr: false,
 
   runtimeConfig: {
-    logSourceUrl: 'http://localhost:3333',
   },
 
   devtools: {
-    enabled: true,
+    enabled: false,
 
     timeline: {
-      enabled: true,
+      enabled: false,
     },
   },
 
