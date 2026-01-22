@@ -50,7 +50,7 @@ function agg_logs(logs: RawLogItem[]) {
   const bucket_normalize = (ts: number) => normalize(ts, bucket_size.value)
   const normalized_logs = logs.map(log => ({ ...log, time: bucket_normalize(log.time) }))
 
-  let max = 0
+  let max = 5
 
   const data = Array.from({ length: total_data_points + 1 }, (_, i) => {
     const timestamp = bucket_normalize(now.value - (i * bucket_size.value))
